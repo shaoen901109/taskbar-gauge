@@ -2,6 +2,8 @@
 
 **English** ・ [繁體中文](README.zh-TW.md)
 
+> 📖 **Step-by-step tutorial (Traditional Chinese):** https://shao-en.com/blog/taskbar-gauge-guide.html — not sure how to set it up? Hand the article to Claude or ChatGPT and let it walk you through.
+
 A small Windows 11 utility that draws three open-ring concentric gauges on the taskbar, just left of the system tray clock:
 
 - **CPU % + RAM**

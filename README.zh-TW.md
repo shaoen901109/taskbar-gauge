@@ -2,6 +2,8 @@
 
 [English](README.md) ・ **繁體中文**
 
+> 📖 **圖文教學：** https://shao-en.com/blog/taskbar-gauge-guide.html ——如果你不知道該如何操作，請把這篇文章交給你的 Claude 或 ChatGPT。
+
 Windows 11 小工具：在工作列時鐘（系統匣）左側畫出三組開口同心圓儀表（缺口朝正下方）：
 
 - **CPU % ＋ RAM**
