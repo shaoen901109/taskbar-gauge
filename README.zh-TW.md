@@ -71,6 +71,23 @@ Windows 11 沒有 deskband，所以本工具為每個工作列各開一個透明
 
 執行 `移除開機啟動.bat` 移除開機捷徑，對儀表按右鍵結束程式，再刪除整個資料夾即可。
 
+## 技術來源與致謝
+
+| 用途 | 元件 | 授權 |
+|---|---|---|
+| 介面與繪圖 | [PySide6 (Qt for Python)](https://doc.qt.io/qtforpython-6/) | LGPL-3.0／GPL-3.0／商業授權 |
+| 系統數據（CPU、RAM、磁碟） | [psutil](https://github.com/giampaolo/psutil) | BSD-3-Clause |
+| NVIDIA GPU 數據（NVML） | [nvidia-ml-py](https://pypi.org/project/nvidia-ml-py/) | BSD-3-Clause |
+| Windows API 呼叫 | [pywin32](https://github.com/mhammond/pywin32) | PSF |
+
+開發過程使用 [Claude Code](https://claude.com/claude-code)（Anthropic）協助。
+
+## 作者
+
+- 網站：https://shaoenstudio.com
+- 聯絡信箱：shaoenstudio@gmail.com
+- GitHub：[@shaoen901109](https://github.com/shaoen901109)
+
 ## 授權
 
 [MIT](LICENSE)

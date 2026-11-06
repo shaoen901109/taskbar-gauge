@@ -71,6 +71,23 @@ If the gauges disappear, look at `error.log` next to the script. Timer callbacks
 
 Run `移除開機啟動.bat` to remove the startup shortcut, right-click a gauge to quit, then delete the folder.
 
+## Credits
+
+| Purpose | Component | License |
+|---|---|---|
+| GUI / drawing | [PySide6 (Qt for Python)](https://doc.qt.io/qtforpython-6/) | LGPL-3.0 / GPL-3.0 / commercial |
+| System metrics (CPU, RAM, disk) | [psutil](https://github.com/giampaolo/psutil) | BSD-3-Clause |
+| NVIDIA GPU metrics (NVML) | [nvidia-ml-py](https://pypi.org/project/nvidia-ml-py/) | BSD-3-Clause |
+| Windows API access | [pywin32](https://github.com/mhammond/pywin32) | PSF |
+
+Developed with the help of [Claude Code](https://claude.com/claude-code) (Anthropic).
+
+## Author
+
+- Website: https://shaoenstudio.com
+- Email: shaoenstudio@gmail.com
+- GitHub: [@shaoen901109](https://github.com/shaoen901109)
+
 ## License
 
 [MIT](LICENSE)
