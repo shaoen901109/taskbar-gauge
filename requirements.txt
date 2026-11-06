@@ -1,0 +1,4 @@
+PySide6-Essentials
+nvidia-ml-py
+psutil
+pywin32

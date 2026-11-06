@@ -1,0 +1,14 @@
+{
+  "update_ms": 1000,
+  "reposition_ms": 500,
+  "animation": true,
+  "theme": "auto",
+  "max_disks": 4,
+  "gauge_pad_dip": 2,
+  "gauge_gap_dip": 12,
+  "primary_tray_gap_dip": 6,
+  "secondary_right_offset_dip": 125,
+  "show_on": "primary",
+  "hide_when_fullscreen": true,
+  "gpu_index": 0
+}
