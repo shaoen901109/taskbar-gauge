@@ -73,6 +73,28 @@ If the gauges disappear, look at `error.log` next to the script. Timer callbacks
 
 Run `移除開機啟動.bat` to remove the startup shortcut, right-click a gauge to quit, then delete the folder.
 
+## Verify your download
+
+Download `taskbar-gauge-v1.0.0.zip` and `SHA256SUMS.txt` from [Releases](https://github.com/shaoen901109/taskbar-gauge/releases) (use the version you actually downloaded).
+
+1. Compare the checksum in PowerShell:
+
+   ```powershell
+   Get-FileHash .\taskbar-gauge-v1.0.0.zip -Algorithm SHA256
+   ```
+
+   The `Hash` must match the string in `SHA256SUMS.txt` (letter case does not matter).
+
+2. Verify where it was built (needs [GitHub CLI](https://cli.github.com/)):
+
+   ```powershell
+   gh attestation verify .\taskbar-gauge-v1.0.0.zip --repo shaoen901109/taskbar-gauge
+   ```
+
+   A successful result means GitHub Actions built this zip from this repository's source and it was not swapped along the way.
+
+Commits marked **Verified** on GitHub are signed by the author.
+
 ## Credits
 
 | Purpose | Component | License |
