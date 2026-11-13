@@ -10,7 +10,7 @@ A small Windows 11 utility that draws three open-ring concentric gauges on the t
 - **GPU % + VRAM** (NVIDIA only, via NVML)
 - **Disk** busy level (up to 4 physical disks; the outer ring is the first disk, ordered by drive id)
 
-Hover the mouse over a gauge to see the full numbers. Right-click to quit.
+Each gauge has a gray label in its bottom opening (CPU / GPU / 硬碟 = disk). Hover the mouse over a gauge to see the full numbers. Right-click to quit.
 
 ## Requirements
 
@@ -37,8 +37,8 @@ Windows 11 has no deskband, so the tool opens one transparent, non-focusable, al
 
 - Primary taskbar: positioned from the left edge of `TrayNotifyWnd` inside `Shell_TrayWnd`.
 - Secondary taskbars (`Shell_SecondaryTrayWnd`) have no such child window, so a fixed offset from the right edge (`secondary_right_offset_dip`) is used.
-- Position and z-order are refreshed every `reposition_ms`; gauges on a monitor are hidden while a fullscreen window is in the foreground. Coordinates are physical pixels, scaled per monitor DPI.
-- Disk busy level = 100 − PDH `\PhysicalDisk(*)\% Idle Time` (same source as Task Manager).
+- Position and z-order are refreshed every `reposition_ms`; the gauges are hidden while the foreground window on any monitor is fullscreen (video, game, browser F11); set `hide_scope` to hide only on that monitor. Coordinates are physical pixels, scaled per monitor DPI.
+- Disk busy level = 100 − PDH `\PhysicalDisk(*)\% Idle Time` (same source as Task Manager). Values below `disk_floor_pct` count as 0 and peaks fall off by `disk_decay`, so an idle disk does not flicker.
 
 ## Configuration
 
@@ -57,6 +57,10 @@ Edit `config.json` next to `taskbar_gauge.py` and restart the program. Missing k
 | `secondary_right_offset_dip` | `125` | offset from the right edge on secondary taskbars (DIP) |
 | `show_on` | `"primary"` | `all`, `primary` or `secondary` |
 | `hide_when_fullscreen` | `true` | hide while a fullscreen window is in front |
+| `hide_scope` | `"any_monitor"` | `any_monitor` (hide when any monitor is fullscreen) or `same_monitor` |
+| `disk_floor_pct` | `3` | disk busy values below this count as 0 (anti-flicker) |
+| `disk_decay` | `0.6` | per-sample fall-off factor for disk values |
+| `label_size` | `0.2` | label font size in the opening (relative to gauge size) |
 | `gpu_index` | `0` | which NVIDIA GPU to read |
 
 ## Known limitations

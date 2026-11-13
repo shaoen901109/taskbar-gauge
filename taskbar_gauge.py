@@ -30,6 +30,8 @@ DEFAULT_CFG = {
     "update_ms": 1000, "reposition_ms": 500, "animation": True, "theme": "auto",
     "max_disks": 4, "gauge_pad_dip": 2, "gauge_gap_dip": 12, "primary_tray_gap_dip": 6,
     "show_on": "secondary",  # all / primary / secondary
+    "hide_scope": "any_monitor",  # any_monitor / same_monitor
+    "disk_floor_pct": 3, "disk_decay": 0.6, "label_size": 0.2,
     "secondary_right_offset_dip": 125, "hide_when_fullscreen": True, "gpu_index": 0,
 }
 
@@ -75,7 +77,10 @@ def find_taskbars():
     res = []
 
     def cb(h, _):
-        cls = win32gui.GetClassName(h)
+        try:
+            cls = win32gui.GetClassName(h)
+        except Exception:  # 列舉途中視窗剛好關掉（2026-11-13 error.log 抓到，舊版因此整個結束）
+            return True
         if cls in ("Shell_TrayWnd", "Shell_SecondaryTrayWnd") and win32gui.IsWindowVisible(h):
             r = win32gui.GetWindowRect(h)
             pt = wintypes.POINT((r[0] + r[2]) // 2, (r[1] + r[3]) // 2)
@@ -137,6 +142,20 @@ class DiskIO:
     def __init__(self):
         self.q = None
         self.cs = []
+
+    def smooth(self, rows):
+        """防閃爍：低於 disk_floor_pct 視為 0（不畫白點），峰值以 disk_decay 緩降，不會每秒忽有忽無。"""
+        prev = getattr(self, "_shown", {})
+        floor, decay = CFG["disk_floor_pct"], CFG["disk_decay"]
+        out, shown = [], {}
+        for name, pct, rd, wr in rows:
+            v = max(pct, prev.get(name, 0.0) * decay)
+            if v < floor:
+                v = 0.0
+            shown[name] = v
+            out.append((name, v, rd, wr))
+        self._shown = shown
+        return out
 
     def _open(self):
         _, inst = win32pdh.EnumObjectItems(None, None, "PhysicalDisk", win32pdh.PERF_DETAIL_WIZARD)
@@ -201,7 +220,7 @@ class Sampler:
         cpu = psutil.cpu_percent(None)
         vm = psutil.virtual_memory()
         g = gpu_sample()
-        disks = self.disk_io.sample(CFG["max_disks"])
+        disks = self.disk_io.smooth(self.disk_io.sample(CFG["max_disks"]))
         d = {}
         # gauge 1: CPU / RAM
         d["cpu"] = dict(
@@ -231,6 +250,7 @@ SWEEP_DEG = 270.0
 
 class GaugeBar(QWidget):
     ORDER = ("cpu", "gpu", "disk")
+    LABELS = {"cpu": "CPU", "gpu": "GPU", "disk": "硬碟"}
 
     def __init__(self, sampler, hmon):
         super().__init__(None, Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
@@ -288,9 +308,9 @@ class GaugeBar(QWidget):
         for gi, key in enumerate(self.ORDER):
             g = self.sampler.data[key]
             vals = self.shown_vals.get(key, g["rings"])
-            cx, cy = gi * cell + cell / 2, h / 2
+            cx, cy = gi * cell + cell / 2, h / 2 - 0.045 * S  # 略往上移，讓開口處放得下標籤
             n = len(vals)
-            r_out = 0.455 * S
+            r_out = 0.445 * S
             if n <= 2:
                 step = 0.135 * S
                 pen_w = 0.085 * S
@@ -343,6 +363,20 @@ class GaugeBar(QWidget):
                         tw = fm.horizontalAdvance(txt)
                         base = ly[li] + fm.ascent() / 2 - fm.descent() / 2
                         p.drawText(int(round(cx - tw / 2)), int(round(base)), txt)
+            # 開口處標籤（缺口在 225°~315°，外圈端點約在 cy+0.32S，標籤放在其下）
+            label = self.LABELS[key]
+            f = QFont("Microsoft JhengHei UI")
+            f.setBold(True)
+            f.setPixelSize(max(7, int(round(CFG["label_size"] * S))))
+            fm = QFontMetricsF(f)
+            while fm.horizontalAdvance(label) > 0.6 * S and f.pixelSize() > 7:
+                f.setPixelSize(f.pixelSize() - 1)
+                fm = QFontMetricsF(f)
+            p.setFont(f)
+            p.setPen(sub)
+            tw = fm.horizontalAdvance(label)
+            base = h - fm.descent() - 0.5  # 貼齊底緣，字的下緣不被切掉
+            p.drawText(int(round(cx - tw / 2)), int(round(base)), label)
         p.end()
 
     def event(self, e):
@@ -428,7 +462,9 @@ class Manager:
                 bar.light = self.light
                 self.bars[hwnd] = bar
                 bar.step()
-            if fs is not None and int(hmon) == fs:
+            # 任一螢幕有前景全螢幕（影片、F11、遊戲）就隱藏；設 "same_monitor" 則只藏同一螢幕
+            hide = fs is not None and (CFG["hide_scope"] != "same_monitor" or int(hmon) == fs)
+            if hide:
                 if bar.isVisible():
                     bar.hide()
                     bar.last_geom = None

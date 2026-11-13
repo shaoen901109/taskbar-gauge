@@ -10,5 +10,8 @@
   "secondary_right_offset_dip": 125,
   "show_on": "primary",
   "hide_when_fullscreen": true,
+  "hide_scope": "any_monitor",
+  "disk_floor_pct": 3,
+  "disk_decay": 0.6,
   "gpu_index": 0
 }

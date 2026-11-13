@@ -10,7 +10,7 @@ Windows 11 小工具：在工作列時鐘（系統匣）左側畫出三組開口
 - **GPU % ＋ VRAM**（僅支援 NVIDIA，透過 NVML）
 - **硬碟**忙碌度（最多 4 顆實體碟，依代號排序，外圈為第一顆）
 
-滑鼠移上去會顯示完整數字，按右鍵可結束程式。
+每組儀表的開口處有灰字標籤（CPU／GPU／硬碟）。滑鼠移上去會顯示完整數字，按右鍵可結束程式。
 
 ## 需求
 
@@ -37,8 +37,8 @@ Windows 11 沒有 deskband，所以本工具為每個工作列各開一個透明
 
 - 主工作列：以 `Shell_TrayWnd` 內 `TrayNotifyWnd` 的左緣定位。
 - 副工作列（`Shell_SecondaryTrayWnd`）沒有該子視窗，改用距右緣的固定偏移（`secondary_right_offset_dip`）。
-- 每隔 `reposition_ms` 重新置頂並重算位置；前景有全螢幕視窗時，該螢幕的儀表會隱藏。座標使用實體像素，並依各螢幕 DPI 換算。
-- 硬碟忙碌度＝100 − PDH `\PhysicalDisk(*)\% Idle Time`（與工作管理員同一來源）。
+- 每隔 `reposition_ms` 重新置頂並重算位置；任一螢幕的前景視窗為全螢幕（影片、遊戲、瀏覽器 F11）時，儀表會隱藏（可用 `hide_scope` 改成只隱藏同一螢幕）。座標使用實體像素，並依各螢幕 DPI 換算。
+- 硬碟忙碌度＝100 − PDH `\PhysicalDisk(*)\% Idle Time`（與工作管理員同一來源）。低於 `disk_floor_pct` 視為 0，峰值依 `disk_decay` 緩降，避免閒置時圓環閃爍。
 
 ## 設定
 
@@ -57,6 +57,10 @@ Windows 11 沒有 deskband，所以本工具為每個工作列各開一個透明
 | `secondary_right_offset_dip` | `125` | 副工作列上距右緣的偏移（DIP） |
 | `show_on` | `"primary"` | `all`、`primary` 或 `secondary` |
 | `hide_when_fullscreen` | `true` | 前景有全螢幕視窗時隱藏 |
+| `hide_scope` | `"any_monitor"` | `any_monitor`（任一螢幕全螢幕就隱藏）或 `same_monitor`（只隱藏同一螢幕） |
+| `disk_floor_pct` | `3` | 硬碟忙碌度低於此值視為 0（防閃爍） |
+| `disk_decay` | `0.6` | 硬碟數值每次取樣最多降到上一次的幾倍（緩降） |
+| `label_size` | `0.2` | 開口處標籤字級（相對儀表大小） |
 | `gpu_index` | `0` | 讀取第幾張 NVIDIA 顯示卡 |
 
 ## 已知限制
